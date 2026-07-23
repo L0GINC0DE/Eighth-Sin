@@ -59,6 +59,10 @@ public class IconDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDrag
     {
         canvasGroup.blocksRaycasts = true;
 
+        Slot startSlotList = startParent != null
+            ? startParent.GetComponentInParent<Slot>()
+            : null;
+
         // Drop 영역이 부모를 변경하지 않았다면 원래 자리로 복귀
         if (transform.parent == onDragParent)
         {
@@ -70,6 +74,7 @@ public class IconDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDrag
                 .SetUpdate(true);
         }
 
+        startSlotList?.CompactDice();
         Icon = null;
     }
 }

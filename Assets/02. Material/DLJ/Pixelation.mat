@@ -194,7 +194,7 @@ Material:
     - _NumLayersCount: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PixelSize: 928.7
+    - _PixelSize: 400
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _SampleGI: 0
