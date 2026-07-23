@@ -14,7 +14,6 @@ public class EnemyFSM : MonoBehaviour
         SkillAttackWaiting,
         BasicAttack,
         SkillAttack,
-        Defense,
         AttackFail    
     }
     private State state;
@@ -23,57 +22,133 @@ public class EnemyFSM : MonoBehaviour
     bool Attacking;
     bool CanAttackBasic;
     bool CanAttackSkill;
-    bool CanDefense;
+    bool CanTurnOverAttackWaiting = true;
     bool Die;
 
     private void Start()
     {
         state = State.Idle;
-        ChangeEnemyState();
+        EnemyTurn();
     }
+    void EnemyWaitingTurn()
+    {
 
+    }
+    void BasicAttackMarkAppear()
+    {
+
+    }
+    void BasicAttack()
+    {
+
+    }
+    void SkillAttackMarkAppear()
+    {
+
+    }
+    void SkillAtack()
+    {
+
+    }
+    void FailAttackMark()
+    {
+
+    }
+    void FailTurnOver()
+    {
+
+    }
+    void TurnSwap()
+    {
+
+    }
     // Update is called once per frame
-    private void ChangeEnemyState()
+    private void EnemyTurn()
     {
         if (!Die)
         {
             switch (state)
             {
-                case State.Idle:
-                    if(CanAttack && !Attacking)
+                case State.Idle: //가만히ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    if (CanAttack && !Attacking)
                     {
                         if (CanAttackSkill)
                         {
                             Attacking = true;
-                            state = State.SkillAttack;
+                            state = State.SkillAttackWaiting;
+                            SkillAttackMarkAppear();
                         }
-                        else if(CanAttackBasic)
+                        else if (CanAttackBasic)
                         {
                             Attacking = true;
-                            state = State.BasicAttack;
+                            state = State.BasicAttackWaiting;
+                            BasicAttackMarkAppear();
                         }
-                        state = State.AttackFail;
+                        else
+                        {
+                            state = State.AttackFail;
+                            EnemyTurn();
+                        }
                     }
                     break;
-                case State.BasicAttackWaiting:
-                    if (WaitingAttackTurn > 0)
+                case State.BasicAttackWaiting: //기본공격기다리기ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    if (CanTurnOverAttackWaiting)
                     {
-                        
+                        if (WaitingAttackTurn > 1)
+                        {
+                            WaitingAttackTurn -= 1;
+                            EnemyWaitingTurn();
+                        }
+                        else
+                        {
+                            WaitingAttackTurn -= 1;
+                            state = State.BasicAttack;
+                            EnemyTurn();
+                        }
+                    }
+                    else
+                    {
+                        FailTurnOver();
                     }
                     break;
-                case State.SkillAttackWaiting:
-
+                case State.SkillAttackWaiting: //스킬공격기다리기ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    if (CanTurnOverAttackWaiting)
+                    {
+                        if (WaitingAttackTurn > 1)
+                        {
+                            WaitingAttackTurn -= 1;
+                            EnemyWaitingTurn();
+                        }
+                        else
+                        {
+                            WaitingAttackTurn -= 1;
+                            state = State.SkillAttack;
+                            EnemyTurn();
+                        }
+                    }
+                    else
+                    {
+                        FailTurnOver();
+                    }
                     break;
-                case State.BasicAttack:
-
+                case State.BasicAttack: //기본공격ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    if (WaitingAttackTurn < 1)
+                    {
+                        BasicAttack();
+                        state = State.Idle;
+                        EnemyTurn();
+                    } 
                     break;
-                case State.SkillAttack:
-
+                case State.SkillAttack: //스킬공격ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    if (WaitingAttackTurn < 1)
+                    {
+                        SkillAtack();
+                        state = State.Idle;
+                        EnemyTurn();
+                    }
                     break;
-                case State.Defense:
-
-                    break;
-                case State.AttackFail:
+                case State.AttackFail: //공격실패ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    FailAttackMark();
                     break;
             }
         }
