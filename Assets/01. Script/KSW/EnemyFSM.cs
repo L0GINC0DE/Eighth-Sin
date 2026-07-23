@@ -56,9 +56,9 @@ public class EnemyFSM : MonoBehaviour
                     }
                     break;
                 case State.BasicAttackWaiting:
-                    if ()
+                    if (WaitingAttackTurn > 0)
                     {
-
+                        
                     }
                     break;
                 case State.SkillAttackWaiting:
