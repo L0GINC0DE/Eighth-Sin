@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyFSM : MonoBehaviour
 {
@@ -7,8 +9,12 @@ public class EnemyFSM : MonoBehaviour
 
     public int WaitingAttackTurn;
 
+    public Slider HPSilder;
+    public Slider TurnSlider;
+    public TMP_Text TurnText;
+
     public int HP;
-    private int NowHP;
+    public int NowHP;
     
     private enum State
     {
@@ -33,12 +39,30 @@ public class EnemyFSM : MonoBehaviour
     }
     private void Start()
     {
+        NowHP = HP;
         state = State.Idle;
         EnemyTurn();
     }
-    public void HPDown() //<- HP를 다운시키려면 이걸 쓰세요!! HP값을 감소시키고 이거를 써야지 HP감소효과가 들어갑니당
+    void BasicAttackEnemyTurnDowning()
     {
-        NowHP = HP;
+        WaitingAttackTurn -= 1;
+        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnText.text = WaitingAttackTurn.ToString();
+    }
+    void SkillAttackEnemyTurnDowning()
+    {
+        WaitingAttackTurn -= 1;
+        TurnSlider.value = (float)WaitingAttackTurn / SkillAttackCoolTime;
+        TurnText.text = WaitingAttackTurn.ToString();
+    }
+    public void HPDown(int HPDownAmount) //<- HP를 다운시키려면 이걸 쓰세요!!
+    {
+        NowHP -= HPDownAmount;
+        HPSilder.value = (float)NowHP / HP;
+    }
+    void HPDownEffect()
+    {
+
     }
     void EnemyWaitingTurn()
     {
@@ -48,21 +72,29 @@ public class EnemyFSM : MonoBehaviour
     void BasicAttackMarkAppear()
     {
         Debug.Log("할 기본공격 표시.");
+        TurnSlider.gameObject.SetActive(true);
+        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnText.text = WaitingAttackTurn.ToString();
         TurnSwap();
     }
     void BasicAttack()
     {
         Debug.Log("기본공격!");
+        TurnSlider.gameObject.SetActive(false);
         TurnSwap();
     }
     void SkillAttackMarkAppear()
     {
         Debug.Log("할 스킬공격 표시.");
+        TurnSlider.gameObject.SetActive(true);
+        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnText.text = WaitingAttackTurn.ToString();
         TurnSwap();
     }
     void SkillAtack()
     {
         Debug.Log("스킬공격!");
+        TurnSlider.gameObject.SetActive(false);
         TurnSwap();
     }
     void FailAttackMark()
@@ -115,12 +147,16 @@ public class EnemyFSM : MonoBehaviour
                     {
                         if (WaitingAttackTurn > 1)
                         {
-                            WaitingAttackTurn -= 1;
+                            BasicAttackEnemyTurnDowning();
+
+
                             EnemyWaitingTurn();
                         }
                         else
                         {
-                            WaitingAttackTurn -= 1;
+                            BasicAttackEnemyTurnDowning();
+
+
                             state = State.BasicAttack;
                             EnemyTurn();
                         }
@@ -135,12 +171,16 @@ public class EnemyFSM : MonoBehaviour
                     {
                         if (WaitingAttackTurn > 1)
                         {
-                            WaitingAttackTurn -= 1;
+                            SkillAttackEnemyTurnDowning();
+
+
                             EnemyWaitingTurn();
                         }
                         else
                         {
-                            WaitingAttackTurn -= 1;
+                            SkillAttackEnemyTurnDowning();
+
+
                             state = State.SkillAttack;
                             EnemyTurn();
                         }
