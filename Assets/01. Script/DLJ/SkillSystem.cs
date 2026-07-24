@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 
 public class SkillSystem : MonoBehaviour, IDropHandler
 {
+    [SerializeField] private GameObject targetSlot;
     public void OnDrop(PointerEventData eventData)
     {
         GameObject draggedObject = eventData.pointerDrag;
@@ -19,7 +20,7 @@ public class SkillSystem : MonoBehaviour, IDropHandler
         RectTransform rect =
             draggedObject.GetComponent<RectTransform>();
 
-        rect.SetParent(transform, false);
+        rect.SetParent(targetSlot.transform, false);
         rect.anchoredPosition = Vector2.zero;
         rect.localRotation = Quaternion.identity;
         rect.localScale = Vector3.one;
