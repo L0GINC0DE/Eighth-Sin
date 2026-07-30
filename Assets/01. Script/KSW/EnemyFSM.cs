@@ -10,7 +10,7 @@ public class EnemyFSM : MonoBehaviour
     public int WaitingAttackTurn;
 
     public Slider HPSilder;
-    public Slider TurnSlider;
+    public Image TurnFillImage;
     public TMP_Text TurnText;
 
     public int HP;
@@ -41,18 +41,19 @@ public class EnemyFSM : MonoBehaviour
     {
         NowHP = HP;
         state = State.Idle;
+
         EnemyTurn();
     }
     void BasicAttackEnemyTurnDowning()
     {
         WaitingAttackTurn -= 1;
-        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnFillImage.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
     }
     void SkillAttackEnemyTurnDowning()
     {
         WaitingAttackTurn -= 1;
-        TurnSlider.value = (float)WaitingAttackTurn / SkillAttackCoolTime;
+        TurnFillImage.fillAmount = (float)WaitingAttackTurn / SkillAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
     }
     public void HPDown(int HPDownAmount) //<- HP를 다운시키려면 이걸 쓰세요!!
@@ -72,29 +73,29 @@ public class EnemyFSM : MonoBehaviour
     void BasicAttackMarkAppear()
     {
         Debug.Log("할 기본공격 표시.");
-        TurnSlider.gameObject.SetActive(true);
-        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnFillImage.gameObject.SetActive(true);
+        TurnFillImage.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
         TurnSwap();
     }
     void BasicAttack()
     {
         Debug.Log("기본공격!");
-        TurnSlider.gameObject.SetActive(false);
+        TurnFillImage.gameObject.SetActive(false);
         TurnSwap();
     }
     void SkillAttackMarkAppear()
     {
         Debug.Log("할 스킬공격 표시.");
-        TurnSlider.gameObject.SetActive(true);
-        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnFillImage.gameObject.SetActive(true);
+        TurnFillImage.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
         TurnSwap();
     }
     void SkillAtack()
     {
         Debug.Log("스킬공격!");
-        TurnSlider.gameObject.SetActive(false);
+        TurnFillImage.gameObject.SetActive(false);
         TurnSwap();
     }
     void FailAttackMark()
