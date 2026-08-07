@@ -1,16 +1,10 @@
-using System;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 
-
-
+[RequireComponent(typeof(SkillPresentation))]
 public class SkillSystem : MonoBehaviour
 {
-    [SerializeField] private GameObject skillObject;
-    [SerializeField] private float insertDistance = 1f;
-    [SerializeField] private float insertDepth = 0.5f;
-    [SerializeField] private float insertDuration = 1f;
+    [SerializeField] private SkillPresentation presentation;
     [SerializeField] private TurnManager turnManager;
     [SerializeField] private DicePool dicePool;
     [SerializeField] private SkillExecutor skillExecutor;
@@ -22,21 +16,14 @@ public class SkillSystem : MonoBehaviour
     
     public SkillType skillType;
 
-    private Sequence diceSequence;
     private int pendingDiceValue;
     private int usesThisTurn;
-    private Vector3 initialLocalPosition;
-    
-    //public event Action<bool> OnDiceSequence;
 
     public UnityEvent skillActivation = new();
 
     private void Awake()
     {
-        if (skillObject == null)
-            skillObject = gameObject;
-
-        initialLocalPosition = transform.localPosition;
+        ResolvePresentation();
     }
 
     private void Start()
@@ -114,8 +101,7 @@ public class SkillSystem : MonoBehaviour
 
     public void InsertDice(GameObject dice)
     {
-        Debug.Log(000000);
-        if (dice == null || skillObject == null)
+        if (dice == null)
             return;
 
         if (!CanUseThisTurn())
@@ -132,64 +118,38 @@ public class SkillSystem : MonoBehaviour
 
         pendingDiceValue = diceValue != null ? diceValue.Value : 0;
 
-        Transform diceSocket = skillObject.transform.Find("DiceSocket");
-        Transform cube = skillObject.transform.Find("Cube");
-
-        Debug.Log(11111);
-
-        if (diceSocket == null)
-            diceSocket = skillObject.transform;
-
         Transform diceTransform = dice.transform;
         ObjectDrag objectDrag = dice.GetComponent<ObjectDrag>();
         Quaternion savedResultRotation =
             objectDrag != null
                 ? objectDrag.ResultRotation
                 : diceTransform.rotation;
-        Quaternion cubeRotation =
-            cube != null ? cube.rotation : diceSocket.rotation;
-        Quaternion insertRotation =
-            cubeRotation * savedResultRotation;
-        Vector3 targetPosition =
-            diceSocket.position - diceSocket.forward * insertDepth;
-        Vector3 startPosition =
-            diceSocket.position + diceSocket.forward * insertDistance;
 
-        diceTransform.DOKill();
-        diceTransform.SetParent(null, true);
-        diceTransform.position = startPosition;
-        diceTransform.rotation = insertRotation;
-
-        diceSequence?.Kill();
-        diceSequence = DOTween.Sequence();
-        diceSequence.Append(
-            diceTransform
-                .DOMove(targetPosition, insertDuration)
-                .SetEase(Ease.InBack)
-                .OnComplete(() =>
-                {
-                    diceTransform.SetParent(transform, true);
-                    diceTransform.rotation = insertRotation;
-                })
+        ResolvePresentation().PlayDiceInsertion(
+            dice,
+            savedResultRotation,
+            () => CompleteSkillPresentation(dice, activeDicePool)
         );
-        diceSequence.AppendInterval(0.2f);
-        diceSequence.Append(transform.DOLocalMoveX(transform.localPosition.x - 5, insertDuration)
-            .SetEase(Ease.InBack)
-            .OnComplete(() =>
-            {
-                skillActivation?.Invoke();
-                activeDicePool?.TryEndPlayerTurnIfEmpty();
+    }
 
-                if (ShouldRemainAvailable())
-                {
-                    transform.localPosition = initialLocalPosition;
-                    dice.SetActive(false);
-                }
-                else
-                    gameObject.SetActive(false);
-            }));
-        
-        Debug.Log("activate");
+    private void CompleteSkillPresentation(GameObject dice, DicePool activeDicePool)
+    {
+        bool isAttackSkill = GetResolvedSkillType() == SkillType.Attack;
+
+        if (isAttackSkill)
+            presentation.Hide();
+
+        skillActivation?.Invoke();
+        activeDicePool?.TryEndPlayerTurnIfEmpty();
+        dice.SetActive(false);
+
+        if (ShouldRemainAvailable())
+        {
+            presentation.ResetView();
+            presentation.Show();
+        }
+        else if (!isAttackSkill)
+            presentation.Hide();
     }
 
     private DicePool ResolveDicePool()
@@ -209,6 +169,7 @@ public class SkillSystem : MonoBehaviour
 
     private void ResolveDependencies()
     {
+        ResolvePresentation();
         ResolveDicePool();
 
         if (skillExecutor == null)
@@ -278,6 +239,24 @@ public class SkillSystem : MonoBehaviour
         return resolvedSkillType != SkillType.Attack && CanUseThisTurn();
     }
 
+    private SkillPresentation ResolvePresentation()
+    {
+        if (presentation == null)
+            presentation = GetComponent<SkillPresentation>();
+
+        if (presentation == null)
+            presentation = gameObject.AddComponent<SkillPresentation>();
+
+        return presentation;
+    }
+
+    private SkillType GetResolvedSkillType()
+    {
+        return skillSo != null
+            ? skillSo.SkillType
+            : skillType;
+    }
+
     private bool HasLivingEnemies()
     {
         EnemyFSM[] enemies = FindObjectsByType<EnemyFSM>(FindObjectsSortMode.None);
@@ -294,9 +273,9 @@ public class SkillSystem : MonoBehaviour
     private void ResetForPlayerTurn()
     {
         usesThisTurn = 0;
-        transform.localPosition = initialLocalPosition;
+        presentation.ResetView();
 
         if (turnManager != null && !turnManager.State.IsBattleOver)
-            gameObject.SetActive(true);
+            presentation.Show();
     }
 }

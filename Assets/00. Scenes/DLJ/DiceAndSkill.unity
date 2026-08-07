@@ -1180,6 +1180,7 @@ GameObject:
   - component: {fileID: 510454978}
   - component: {fileID: 510454977}
   - component: {fileID: 510454976}
+  - component: {fileID: 510454979}
   m_Layer: 0
   m_Name: Skill2
   m_TagString: Untagged
@@ -1220,10 +1221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e394a803239b5eb4ba9b346bd14801fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillSystem
-  skillObject: {fileID: 0}
-  insertDistance: -0.5
-  insertDepth: -0.13
-  insertDuration: 0.7
+  presentation: {fileID: 510454979}
   turnManager: {fileID: 93958017}
   dicePool: {fileID: 0}
   skillExecutor: {fileID: 0}
@@ -1234,6 +1232,22 @@ MonoBehaviour:
   skillActivation:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &510454979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510454975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b1ae52d91647e09ba7cefd151bbf21, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillPresentation
+  skillObject: {fileID: 0}
+  insertDistance: 0.5
+  insertDepth: 0.13
+  insertDuration: 0.7
 --- !u!4 &510454978
 Transform:
   m_ObjectHideFlags: 0
@@ -1408,6 +1422,7 @@ GameObject:
   - component: {fileID: 536198627}
   - component: {fileID: 536198626}
   - component: {fileID: 536198628}
+  - component: {fileID: 536198629}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -1485,10 +1500,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e394a803239b5eb4ba9b346bd14801fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillSystem
-  skillObject: {fileID: 0}
-  insertDistance: 1
-  insertDepth: 0.5
-  insertDuration: 1
+  presentation: {fileID: 536198629}
   turnManager: {fileID: 0}
   dicePool: {fileID: 0}
   skillExecutor: {fileID: 0}
@@ -1499,6 +1511,22 @@ MonoBehaviour:
   skillActivation:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &536198629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536198624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b1ae52d91647e09ba7cefd151bbf21, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillPresentation
+  skillObject: {fileID: 0}
+  insertDistance: 1
+  insertDepth: 0.5
+  insertDuration: 1
 --- !u!1 &588496018
 GameObject:
   m_ObjectHideFlags: 0
@@ -1911,6 +1939,7 @@ GameObject:
   - component: {fileID: 914421731}
   - component: {fileID: 914421732}
   - component: {fileID: 914421733}
+  - component: {fileID: 914421734}
   m_Layer: 0
   m_Name: Skill1
   m_TagString: Untagged
@@ -1947,10 +1976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e394a803239b5eb4ba9b346bd14801fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillSystem
-  skillObject: {fileID: 0}
-  insertDistance: -0.5
-  insertDepth: -0.13
-  insertDuration: 0.7
+  presentation: {fileID: 914421734}
   turnManager: {fileID: 93958017}
   dicePool: {fileID: 0}
   skillExecutor: {fileID: 0}
@@ -1961,6 +1987,22 @@ MonoBehaviour:
   skillActivation:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &914421734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 914421730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b1ae52d91647e09ba7cefd151bbf21, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillPresentation
+  skillObject: {fileID: 0}
+  insertDistance: 0.5
+  insertDepth: 0.13
+  insertDuration: 0.7
 --- !u!65 &914421733
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3761,6 +3803,7 @@ GameObject:
   - component: {fileID: 1419841563}
   - component: {fileID: 1419841562}
   - component: {fileID: 1419841561}
+  - component: {fileID: 1419841564}
   m_Layer: 0
   m_Name: Skill3
   m_TagString: Untagged
@@ -3801,10 +3844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e394a803239b5eb4ba9b346bd14801fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillSystem
-  skillObject: {fileID: 0}
-  insertDistance: -0.5
-  insertDepth: -0.13
-  insertDuration: 0.7
+  presentation: {fileID: 1419841564}
   turnManager: {fileID: 93958017}
   dicePool: {fileID: 0}
   skillExecutor: {fileID: 0}
@@ -3815,6 +3855,22 @@ MonoBehaviour:
   skillActivation:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1419841564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419841560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52b1ae52d91647e09ba7cefd151bbf21, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SkillPresentation
+  skillObject: {fileID: 0}
+  insertDistance: 0.5
+  insertDepth: 0.13
+  insertDuration: 0.7
 --- !u!4 &1419841563
 Transform:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TurnManager : MonoBehaviour
@@ -6,10 +7,15 @@ public class TurnManager : MonoBehaviour
     [SerializeField] private Team startingTurn = Team.Player;
     [SerializeField] private BattleState battleState = new();
 
+    [Header("Enemies")]
+    [SerializeField] private bool autoFindEnemies = true;
+    [SerializeField] private List<EnemyFSM> enemies = new();
+
     public Team CurrentTurn => battleState.CurrentTurn;
     public BattleState State => battleState;
     public DicePool DicePool { get; private set; }
     public bool IsProcessingTurn => _isProcessingTurn;
+    public IReadOnlyList<EnemyFSM> Enemies => enemies;
 
     public event Action<Team> OnTurnChanged;
     public event Action OnPlayerTurnStarted;
@@ -19,6 +25,9 @@ public class TurnManager : MonoBehaviour
     public event Action<bool> OnBattleEnded;
 
     private bool _isProcessingTurn;
+    private readonly List<EnemyFSM> _enemyTurnOrder = new();
+    private EnemyFSM _activeEnemy;
+    private int _enemyTurnIndex;
 
     private void Awake()
     {
@@ -55,7 +64,7 @@ public class TurnManager : MonoBehaviour
         _isProcessingTurn = true;
         OnPlayerTurnEnded?.Invoke();
         SetTurn(Team.Enemy);
-        OnEnemyTurnStarted?.Invoke();
+        BeginEnemyTurn();
         return true;
     }
 
@@ -72,6 +81,8 @@ public class TurnManager : MonoBehaviour
         if (battleState.IsBattleOver || CurrentTurn != Team.Enemy)
             return;
 
+        _activeEnemy = null;
+        _enemyTurnOrder.Clear();
         OnEnemyTurnEnded?.Invoke();
         _isProcessingTurn = false;
         SetTurn(Team.Player);
@@ -106,6 +117,79 @@ public class TurnManager : MonoBehaviour
             OnPlayerTurnStarted?.Invoke();
         }
         else
-            OnEnemyTurnStarted?.Invoke();
+        {
+            _isProcessingTurn = true;
+            BeginEnemyTurn();
+        }
+    }
+
+    private void BeginEnemyTurn()
+    {
+        OnEnemyTurnStarted?.Invoke();
+        BuildEnemyTurnOrder();
+        _enemyTurnIndex = 0;
+        ProcessNextEnemy();
+    }
+
+    private void BuildEnemyTurnOrder()
+    {
+        _enemyTurnOrder.Clear();
+
+        foreach (EnemyFSM enemy in enemies)
+            AddEnemyToTurnOrder(enemy);
+
+        if (autoFindEnemies)
+        {
+            EnemyFSM[] foundEnemies =
+                FindObjectsByType<EnemyFSM>(FindObjectsSortMode.None);
+
+            foreach (EnemyFSM enemy in foundEnemies)
+                AddEnemyToTurnOrder(enemy);
+        }
+
+        _enemyTurnOrder.Sort((left, right) =>
+        {
+            int priorityComparison =
+                right.TurnPriority.CompareTo(left.TurnPriority);
+
+            return priorityComparison != 0
+                ? priorityComparison
+                : left.GetInstanceID().CompareTo(right.GetInstanceID());
+        });
+    }
+
+    private void AddEnemyToTurnOrder(EnemyFSM enemy)
+    {
+        if (enemy != null && !_enemyTurnOrder.Contains(enemy))
+            _enemyTurnOrder.Add(enemy);
+    }
+
+    private void ProcessNextEnemy()
+    {
+        if (battleState.IsBattleOver || CurrentTurn != Team.Enemy)
+            return;
+
+        while (_enemyTurnIndex < _enemyTurnOrder.Count)
+        {
+            EnemyFSM enemy = _enemyTurnOrder[_enemyTurnIndex++];
+
+            if (enemy == null || enemy.Die || !enemy.isActiveAndEnabled)
+                continue;
+
+            _activeEnemy = enemy;
+            enemy.TakeTurn(HandleEnemyTurnCompleted);
+            return;
+        }
+
+        EndEnemyTurn();
+    }
+
+    private void HandleEnemyTurnCompleted(EnemyFSM enemy)
+    {
+        if (enemy != _activeEnemy)
+            return;
+
+        _activeEnemy = null;
+        ProcessNextEnemy();
     }
 }

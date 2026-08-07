@@ -14,6 +14,24 @@ public class DiceRotation : MonoBehaviour
     [SerializeField] private AnimationCurve rotationEase;
     [SerializeField] private bool enableSpacebarDebugRoll;
 
+    private readonly List<DiceHome> diceHomes = new();
+    private readonly List<DiceHome> initialDiceHomes = new();
+
+    private sealed class DiceHome
+    {
+        public GameObject Dice;
+        public Transform Parent;
+        public Vector3 LocalPosition;
+        public Quaternion LocalRotation;
+        public Vector3 LocalScale;
+        public bool HasBeenRolled;
+    }
+
+    private void Awake()
+    {
+        CacheInitialDice();
+    }
+
     private void Update()
     {
         if (enableSpacebarDebugRoll &&
@@ -34,14 +52,16 @@ public class DiceRotation : MonoBehaviour
         diceSequence?.Kill();
         diceSequence = DOTween.Sequence();
 
-        int rollCount = Mathf.Min(count, dices.Length);
-
-        for (int i = 0; i < rollCount; i++)
+        for (int i = 0; i < count; i++)
         {
-            GameObject dice = dices[i];
+            DiceHome diceHome = GetAvailableDice();
 
-            if (dice == null)
-                continue;
+            if (diceHome == null)
+                break;
+
+            GameObject dice = diceHome.Dice;
+            RestoreDice(diceHome);
+            diceHome.HasBeenRolled = true;
 
             int result = Random.Range(1, 7);
             results.Add(result);
@@ -77,6 +97,79 @@ public class DiceRotation : MonoBehaviour
         }
 
         return results;
+    }
+
+    private void CacheInitialDice()
+    {
+        diceHomes.Clear();
+        initialDiceHomes.Clear();
+
+        if (dices == null)
+            return;
+
+        foreach (GameObject dice in dices)
+        {
+            if (dice == null)
+                continue;
+
+            DiceHome home = CreateHome(dice);
+            diceHomes.Add(home);
+            initialDiceHomes.Add(home);
+        }
+    }
+
+    private DiceHome GetAvailableDice()
+    {
+        foreach (DiceHome home in diceHomes)
+        {
+            if (!home.HasBeenRolled || !home.Dice.activeSelf)
+                return home;
+        }
+
+        return CreateOverflowDice();
+    }
+
+    private DiceHome CreateOverflowDice()
+    {
+        if (initialDiceHomes.Count == 0)
+            return null;
+
+        int templateIndex = diceHomes.Count % initialDiceHomes.Count;
+        DiceHome templateHome = initialDiceHomes[templateIndex];
+        GameObject dice = Instantiate(templateHome.Dice, templateHome.Parent);
+        DiceHome home = CreateHome(dice);
+
+        home.LocalPosition = templateHome.LocalPosition;
+        home.LocalRotation = templateHome.LocalRotation;
+        home.LocalScale = templateHome.LocalScale;
+
+        diceHomes.Add(home);
+        return home;
+    }
+
+    private static DiceHome CreateHome(GameObject dice)
+    {
+        Transform diceTransform = dice.transform;
+
+        return new DiceHome
+        {
+            Dice = dice,
+            Parent = diceTransform.parent,
+            LocalPosition = diceTransform.localPosition,
+            LocalRotation = diceTransform.localRotation,
+            LocalScale = diceTransform.localScale
+        };
+    }
+
+    private static void RestoreDice(DiceHome home)
+    {
+        Transform diceTransform = home.Dice.transform;
+        diceTransform.DOKill();
+        diceTransform.SetParent(home.Parent, false);
+        diceTransform.localPosition = home.LocalPosition;
+        diceTransform.localRotation = home.LocalRotation;
+        diceTransform.localScale = home.LocalScale;
+        home.Dice.SetActive(true);
     }
 
     private Vector3 GetResultAngle(int result)

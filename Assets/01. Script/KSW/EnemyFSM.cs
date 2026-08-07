@@ -1,16 +1,20 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class EnemyFSM : MonoBehaviour
 {
+    [Header("Turn Order")]
+    [SerializeField] private int turnPriority;
+
     public int BasicAttackCoolTime;
     public int SkillAttackCoolTime;
 
     public int WaitingAttackTurn;
 
     public Slider HPSilder;
-    public Slider TurnSlider;
+    public Image TurnSlider;
     public TMP_Text TurnText;
 
     public int HP;
@@ -33,26 +37,39 @@ public class EnemyFSM : MonoBehaviour
     public bool CanTurnOverAttackWaiting = true;
     public bool Die;
 
+    public int TurnPriority => turnPriority;
+
+    private Action<EnemyFSM> turnCompleted;
+
     public void ThisIsForTestEnemyTurn() //테스트
     {
         EnemyTurn();
     }
-    private void Start()
+    private void Awake()
     {
         NowHP = HP;
         state = State.Idle;
-        EnemyTurn();
+    }
+
+    public void TakeTurn(Action<EnemyFSM> onCompleted)
+    {
+        turnCompleted = onCompleted;
+
+        if (!Die)
+            EnemyTurn();
+
+        CompleteTurn();
     }
     void BasicAttackEnemyTurnDowning()
     {
         WaitingAttackTurn -= 1;
-        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnSlider.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
     }
     void SkillAttackEnemyTurnDowning()
     {
         WaitingAttackTurn -= 1;
-        TurnSlider.value = (float)WaitingAttackTurn / SkillAttackCoolTime;
+        TurnSlider.fillAmount = (float)WaitingAttackTurn / SkillAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
     }
     public void HPDown(int HPDownAmount) //<- HP를 다운시키려면 이걸 쓰세요!!
@@ -73,7 +90,7 @@ public class EnemyFSM : MonoBehaviour
     {
         Debug.Log("할 기본공격 표시.");
         TurnSlider.gameObject.SetActive(true);
-        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnSlider.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
         TurnSwap();
     }
@@ -87,7 +104,7 @@ public class EnemyFSM : MonoBehaviour
     {
         Debug.Log("할 스킬공격 표시.");
         TurnSlider.gameObject.SetActive(true);
-        TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
+        TurnSlider.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
         TurnSwap();
     }
@@ -109,7 +126,14 @@ public class EnemyFSM : MonoBehaviour
     }
     void TurnSwap()
     {
+        // TurnManager가 TakeTurn 호출이 끝난 뒤 다음 적을 실행한다.
+    }
 
+    private void CompleteTurn()
+    {
+        Action<EnemyFSM> callback = turnCompleted;
+        turnCompleted = null;
+        callback?.Invoke(this);
     }
     // Update is called once per frame
     private void EnemyTurn()
