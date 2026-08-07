@@ -40,14 +40,12 @@ public sealed class DicePool : MonoBehaviour
         }
 
         lastRoll.Clear();
+        turnManager.State.ClearDice();
 
         if (diceRotation != null)
         {
             IReadOnlyList<int> rolledValues = diceRotation.RollDice(dicePerTurn);
             lastRoll.AddRange(rolledValues);
-
-            while (lastRoll.Count < dicePerTurn)
-                lastRoll.Add(Random.Range(1, fallbackDiceSides + 1));
         }
         else
         {

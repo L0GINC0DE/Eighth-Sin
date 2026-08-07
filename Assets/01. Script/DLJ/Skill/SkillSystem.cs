@@ -136,12 +136,13 @@ public class SkillSystem : MonoBehaviour
     {
         bool isAttackSkill = GetResolvedSkillType() == SkillType.Attack;
 
+        dice.SetActive(false);
+
         if (isAttackSkill)
             presentation.Hide();
 
         skillActivation?.Invoke();
         activeDicePool?.TryEndPlayerTurnIfEmpty();
-        dice.SetActive(false);
 
         if (ShouldRemainAvailable())
         {

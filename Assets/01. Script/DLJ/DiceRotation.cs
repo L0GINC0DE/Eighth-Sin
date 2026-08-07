@@ -15,7 +15,6 @@ public class DiceRotation : MonoBehaviour
     [SerializeField] private bool enableSpacebarDebugRoll;
 
     private readonly List<DiceHome> diceHomes = new();
-    private readonly List<DiceHome> initialDiceHomes = new();
 
     private sealed class DiceHome
     {
@@ -52,15 +51,18 @@ public class DiceRotation : MonoBehaviour
         diceSequence?.Kill();
         diceSequence = DOTween.Sequence();
 
-        for (int i = 0; i < count; i++)
+        int slotCount = Mathf.Min(count, diceHomes.Count);
+        for (int i = 0; i < slotCount; i++)
         {
-            DiceHome diceHome = GetAvailableDice();
-
-            if (diceHome == null)
-                break;
+            DiceHome diceHome = diceHomes[i];
 
             GameObject dice = diceHome.Dice;
-            RestoreDice(diceHome);
+
+            if (NeedsRefill(diceHome))
+                RestoreDice(diceHome);
+            else
+                dice.transform.DOKill();
+
             diceHome.HasBeenRolled = true;
 
             int result = Random.Range(1, 7);
@@ -102,7 +104,6 @@ public class DiceRotation : MonoBehaviour
     private void CacheInitialDice()
     {
         diceHomes.Clear();
-        initialDiceHomes.Clear();
 
         if (dices == null)
             return;
@@ -114,37 +115,14 @@ public class DiceRotation : MonoBehaviour
 
             DiceHome home = CreateHome(dice);
             diceHomes.Add(home);
-            initialDiceHomes.Add(home);
         }
     }
 
-    private DiceHome GetAvailableDice()
+    private static bool NeedsRefill(DiceHome home)
     {
-        foreach (DiceHome home in diceHomes)
-        {
-            if (!home.HasBeenRolled || !home.Dice.activeSelf)
-                return home;
-        }
-
-        return CreateOverflowDice();
-    }
-
-    private DiceHome CreateOverflowDice()
-    {
-        if (initialDiceHomes.Count == 0)
-            return null;
-
-        int templateIndex = diceHomes.Count % initialDiceHomes.Count;
-        DiceHome templateHome = initialDiceHomes[templateIndex];
-        GameObject dice = Instantiate(templateHome.Dice, templateHome.Parent);
-        DiceHome home = CreateHome(dice);
-
-        home.LocalPosition = templateHome.LocalPosition;
-        home.LocalRotation = templateHome.LocalRotation;
-        home.LocalScale = templateHome.LocalScale;
-
-        diceHomes.Add(home);
-        return home;
+        return !home.HasBeenRolled ||
+               !home.Dice.activeSelf ||
+               home.Dice.transform.parent != home.Parent;
     }
 
     private static DiceHome CreateHome(GameObject dice)

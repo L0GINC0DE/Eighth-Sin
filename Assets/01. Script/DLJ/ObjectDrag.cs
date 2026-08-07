@@ -100,6 +100,12 @@ public class ObjectDrag : MonoBehaviour
 
     private void TouchEndedEvent(Vector2 pointerPosition)
     {
+        if (Icon == null)
+        {
+            _isDragging = false;
+            return;
+        }
+
         Ray ray = TargetCamera.ScreenPointToRay(pointerPosition);
         RaycastHit[] hits = Physics.RaycastAll(ray);
         Array.Sort(hits, (left, right) => left.distance.CompareTo(right.distance));
@@ -117,20 +123,32 @@ public class ObjectDrag : MonoBehaviour
 
         if (dropTarget.HasValue)
         {
-            GameObject targetTransform = dropTarget.Value.transform.gameObject;
-            SkillSystem skillSystem = targetTransform.GetComponent<SkillSystem>();
+            Transform hitTransform = dropTarget.Value.transform;
+            SkillSystem skillSystem =
+                hitTransform.GetComponentInParent<SkillSystem>();
 
-            skillSystem.InsertDice(Icon);
-            Debug.Log("hit info : " + targetTransform.gameObject.name); ;
+            if (skillSystem != null)
+            {
+                skillSystem.InsertDice(Icon);
+                Debug.Log("hit info : " + skillSystem.gameObject.name);
+            }
+            else
+                RestoreDraggedObject();
         }
         else
-        {
-            Icon.transform.position = _beforePosition;
-            Icon.transform.rotation = _beforeRotation;
-        }
+            RestoreDraggedObject();
 
         _isDragging = false;
         Icon = null;
+    }
+
+    private void RestoreDraggedObject()
+    {
+        if (Icon == null)
+            return;
+
+        Icon.transform.position = _beforePosition;
+        Icon.transform.rotation = _beforeRotation;
     }
 
     private ObjectDrag FindDraggable(Vector2 pointerPosition)

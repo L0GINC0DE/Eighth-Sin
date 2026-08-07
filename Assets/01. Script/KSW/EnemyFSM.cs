@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class EnemyFSM : MonoBehaviour
@@ -14,6 +15,7 @@ public class EnemyFSM : MonoBehaviour
     public int WaitingAttackTurn;
 
     public Slider HPSilder;
+    [FormerlySerializedAs("TurnFillImage")]
     public Image TurnSlider;
     public TMP_Text TurnText;
 
@@ -63,19 +65,19 @@ public class EnemyFSM : MonoBehaviour
     void BasicAttackEnemyTurnDowning()
     {
         WaitingAttackTurn -= 1;
-        TurnSlider.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
-        TurnText.text = WaitingAttackTurn.ToString();
+        UpdateTurnDisplay(BasicAttackCoolTime);
     }
     void SkillAttackEnemyTurnDowning()
     {
         WaitingAttackTurn -= 1;
-        TurnSlider.fillAmount = (float)WaitingAttackTurn / SkillAttackCoolTime;
-        TurnText.text = WaitingAttackTurn.ToString();
+        UpdateTurnDisplay(SkillAttackCoolTime);
     }
     public void HPDown(int HPDownAmount) //<- HP를 다운시키려면 이걸 쓰세요!!
     {
         NowHP -= HPDownAmount;
-        HPSilder.value = (float)NowHP / HP;
+
+        if (HPSilder != null)
+            HPSilder.value = HP > 0 ? (float)NowHP / HP : 0f;
     }
     void HPDownEffect()
     {
@@ -89,29 +91,27 @@ public class EnemyFSM : MonoBehaviour
     void BasicAttackMarkAppear()
     {
         Debug.Log("할 기본공격 표시.");
-        TurnSlider.gameObject.SetActive(true);
-        TurnSlider.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
-        TurnText.text = WaitingAttackTurn.ToString();
+        SetTurnDisplayVisible(true);
+        UpdateTurnDisplay(BasicAttackCoolTime);
         TurnSwap();
     }
     void BasicAttack()
     {
         Debug.Log("기본공격!");
-        TurnSlider.gameObject.SetActive(false);
+        SetTurnDisplayVisible(false);
         TurnSwap();
     }
     void SkillAttackMarkAppear()
     {
         Debug.Log("할 스킬공격 표시.");
-        TurnSlider.gameObject.SetActive(true);
-        TurnSlider.fillAmount = (float)WaitingAttackTurn / BasicAttackCoolTime;
-        TurnText.text = WaitingAttackTurn.ToString();
+        SetTurnDisplayVisible(true);
+        UpdateTurnDisplay(SkillAttackCoolTime);
         TurnSwap();
     }
     void SkillAtack()
     {
         Debug.Log("스킬공격!");
-        TurnSlider.gameObject.SetActive(false);
+        SetTurnDisplayVisible(false);
         TurnSwap();
     }
     void FailAttackMark()
@@ -127,6 +127,25 @@ public class EnemyFSM : MonoBehaviour
     void TurnSwap()
     {
         // TurnManager가 TakeTurn 호출이 끝난 뒤 다음 적을 실행한다.
+    }
+
+    private void UpdateTurnDisplay(int coolTime)
+    {
+        if (TurnSlider != null)
+        {
+            TurnSlider.fillAmount = coolTime > 0
+                ? (float)WaitingAttackTurn / coolTime
+                : 0f;
+        }
+
+        if (TurnText != null)
+            TurnText.text = WaitingAttackTurn.ToString();
+    }
+
+    private void SetTurnDisplayVisible(bool visible)
+    {
+        if (TurnSlider != null)
+            TurnSlider.gameObject.SetActive(visible);
     }
 
     private void CompleteTurn()
