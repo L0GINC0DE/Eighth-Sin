@@ -149,11 +149,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d437a4d6ac05a5641a1baaa16338a114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFSM
+  turnPriority: 0
   BasicAttackCoolTime: 4
   SkillAttackCoolTime: 4
   WaitingAttackTurn: 0
   HPSilder: {fileID: 561484728}
-  TurnFillImage: {fileID: 1710565485}
+  TurnSlider: {fileID: 1448150241}
   TurnText: {fileID: 1283936001}
   HP: 100
   NowHP: 0
@@ -230,8 +231,8 @@ Transform:
   m_GameObject: {fileID: 129742437}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -48.32, y: -1.18, z: 0.16181183}
-  m_LocalScale: {x: 6, y: 6, z: 1}
+  m_LocalPosition: {x: -830.6, y: -177.08, z: 0.16181183}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1098525884}
