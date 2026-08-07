@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0af77b25456741409b9cf3d998507da, type: 3}
+  m_Name: TestAttack
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSo
+  skillId: HeavenlyAttack
+  displayName: "\uCC9C\uC0C1\uC758 \uACF5\uACA9"
+  description: "\u201C\uC774 \uC5B4\uB9B0\uC591\uC758 \uAE30\uB3C4\uAC00 \uB2FF\uAE30\uB97C\u201D"
+  icon: {fileID: 21300000, guid: 73b1731ab37eb7944bc6cc137d386d6c, type: 3}
+  skillType: 0
+  skillGroup: 0
+  requiredWeapon: 1
+  maxUsesPerTurn: 1
+  corruptionCost:
+    source: 0
+    multiplier: 0
+    flatBonus: 0
+  permanentCorruptionPercent: 0
+  effects:
+  - rid: 1003
+  penalties: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1003
+      type: {class: DealDamageEffect, ns: , asm: Assembly-CSharp}
+      data:
+        baseDamage:
+          source: 1
+          multiplier: 1
+          flatBonus: 5

@@ -33,7 +33,7 @@ public class EnemyFSM : MonoBehaviour
     public bool CanTurnOverAttackWaiting = true;
     public bool Die;
 
-    public void ThisIsForTestEnemyTurn() //�׽�Ʈ
+    public void ThisIsForTestEnemyTurn() //테스트
     {
         EnemyTurn();
     }
@@ -55,7 +55,7 @@ public class EnemyFSM : MonoBehaviour
         TurnSlider.value = (float)WaitingAttackTurn / SkillAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
     }
-    public void HPDown(int HPDownAmount) //<- HP�� �ٿ��Ű���� �̰� ������!!
+    public void HPDown(int HPDownAmount) //<- HP를 다운시키려면 이걸 쓰세요!!
     {
         NowHP -= HPDownAmount;
         HPSilder.value = (float)NowHP / HP;
@@ -66,12 +66,12 @@ public class EnemyFSM : MonoBehaviour
     }
     void EnemyWaitingTurn()
     {
-        Debug.Log("�� ��ٸ�����");
+        Debug.Log("턴 기다리는중");
         TurnSwap();
     }
     void BasicAttackMarkAppear()
     {
-        Debug.Log("�� �⺻���� ǥ��.");
+        Debug.Log("할 기본공격 표시.");
         TurnSlider.gameObject.SetActive(true);
         TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
@@ -79,13 +79,13 @@ public class EnemyFSM : MonoBehaviour
     }
     void BasicAttack()
     {
-        Debug.Log("�⺻����!");
+        Debug.Log("기본공격!");
         TurnSlider.gameObject.SetActive(false);
         TurnSwap();
     }
     void SkillAttackMarkAppear()
     {
-        Debug.Log("�� ��ų���� ǥ��.");
+        Debug.Log("할 스킬공격 표시.");
         TurnSlider.gameObject.SetActive(true);
         TurnSlider.value = (float)WaitingAttackTurn / BasicAttackCoolTime;
         TurnText.text = WaitingAttackTurn.ToString();
@@ -93,18 +93,18 @@ public class EnemyFSM : MonoBehaviour
     }
     void SkillAtack()
     {
-        Debug.Log("��ų����!");
+        Debug.Log("스킬공격!");
         TurnSlider.gameObject.SetActive(false);
         TurnSwap();
     }
     void FailAttackMark()
     {
-        Debug.Log("���� ��ũ ǥ�� ����.");
+        Debug.Log("공격 마크 표시 실패.");
         TurnSwap();
     }
     void FailTurnOver()
     {
-        Debug.Log("�� �ѱ�� ����.");
+        Debug.Log("턴 넘기기 실패.");
         TurnSwap();
     }
     void TurnSwap()
@@ -118,7 +118,7 @@ public class EnemyFSM : MonoBehaviour
         {
             switch (state)
             {
-                case State.Idle: //�������ѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�
+                case State.Idle: //가만히ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                     if (CanAttack)
                     {
                         if (CanAttackSkill)
@@ -142,7 +142,7 @@ public class EnemyFSM : MonoBehaviour
                         }
                     }
                     break;
-                case State.BasicAttackWaiting: //�⺻���ݱ�ٸ���ѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�
+                case State.BasicAttackWaiting: //기본공격기다리기ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                     if (CanTurnOverAttackWaiting)
                     {
                         if (WaitingAttackTurn > 1)
@@ -166,7 +166,7 @@ public class EnemyFSM : MonoBehaviour
                         FailTurnOver();
                     }
                     break;
-                case State.SkillAttackWaiting: //��ų���ݱ�ٸ���ѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�
+                case State.SkillAttackWaiting: //스킬공격기다리기ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                     if (CanTurnOverAttackWaiting)
                     {
                         if (WaitingAttackTurn > 1)
@@ -190,7 +190,7 @@ public class EnemyFSM : MonoBehaviour
                         FailTurnOver();
                     }
                     break;
-                case State.BasicAttack: //�⺻���ݤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�
+                case State.BasicAttack: //기본공격ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                     if (WaitingAttackTurn < 1)
                     {
                         BasicAttack();
@@ -198,7 +198,7 @@ public class EnemyFSM : MonoBehaviour
                         EnemyTurn();
                     } 
                     break;
-                case State.SkillAttack: //��ų���ݤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�
+                case State.SkillAttack: //스킬공격ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                     if (WaitingAttackTurn < 1)
                     {
                         SkillAtack();
@@ -206,7 +206,7 @@ public class EnemyFSM : MonoBehaviour
                         EnemyTurn();
                     }
                     break;
-                case State.AttackFail: //���ݽ��ФѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�
+                case State.AttackFail: //공격실패ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                     FailAttackMark();
                     break;
             }
