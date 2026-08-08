@@ -154,7 +154,7 @@ MonoBehaviour:
   SkillAttackCoolTime: 4
   WaitingAttackTurn: 0
   HPSilder: {fileID: 561484728}
-  TurnSlider: {fileID: 1448150241}
+  TurnSlider: {fileID: 1710565485}
   TurnText: {fileID: 1283936001}
   HP: 100
   NowHP: 0
