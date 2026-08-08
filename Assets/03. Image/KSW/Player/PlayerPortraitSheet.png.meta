@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ef2a66f13ecf893419f96125bbc3ce8c
+guid: eeeff857873f2a9458e3619ac0885b63
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: PlayerPortraitSheet_0
+      name: NormalAngel-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -112,14 +112,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2f10021d7aa22154b9d3add52c0b1a89
-      internalID: -449707224
+      spriteID: 386cb993dea2ce94a9f9a7ec64fb9cc7
+      internalID: -931615042
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_1
+      name: NormalAngel-Sheet_1
       rect:
         serializedVersion: 2
         x: 128
@@ -134,14 +134,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6a02453fac387ca48a6763ba0da01cdc
-      internalID: 1245050396
+      spriteID: 1fe6dd65df9aa99438d1aa0227c5f30f
+      internalID: -1199246827
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_2
+      name: NormalAngel-Sheet_2
       rect:
         serializedVersion: 2
         x: 256
@@ -156,14 +156,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8e5c9ce4fd23b6648952a53930a580e4
-      internalID: -2085272300
+      spriteID: 551b5bef6e823314283ef600fdf9f818
+      internalID: 479871594
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_3
+      name: NormalAngel-Sheet_3
       rect:
         serializedVersion: 2
         x: 384
@@ -178,14 +178,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cbbbedaf10ccda442af7101d207c1b69
-      internalID: -1438641395
+      spriteID: 4fb1e2c7abe76474693f3dd845d681e7
+      internalID: -61239356
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_4
+      name: NormalAngel-Sheet_4
       rect:
         serializedVersion: 2
         x: 512
@@ -200,14 +200,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f5325cd4f3c637141979601b6a2a15b5
-      internalID: 558603055
+      spriteID: 91374e09a1fd6ac47bea53e8d265eeea
+      internalID: 1373266489
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_5
+      name: NormalAngel-Sheet_5
       rect:
         serializedVersion: 2
         x: 640
@@ -222,14 +222,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e7abb99973ea6154f963684bd26448de
-      internalID: -1672043721
+      spriteID: 545e46760f7e4024a80708610c416a88
+      internalID: 472075659
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_6
+      name: NormalAngel-Sheet_6
       rect:
         serializedVersion: 2
         x: 768
@@ -244,14 +244,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 74c47d8bbc9c6134b81d12589f31c8f4
-      internalID: 1226281510
+      spriteID: 5ac67faf296f4be4ea13abf1ce077bcc
+      internalID: -856255287
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_7
+      name: NormalAngel-Sheet_7
       rect:
         serializedVersion: 2
         x: 896
@@ -266,14 +266,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b49483f2e6e7ea94f80b935ce4483b2a
-      internalID: 1937167732
+      spriteID: b55ab78fb55011b44bd03bca764092f1
+      internalID: 11468455
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_8
+      name: NormalAngel-Sheet_8
       rect:
         serializedVersion: 2
         x: 1024
@@ -288,14 +288,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 847804c18323ffa42a566d482cec959f
-      internalID: -575426680
+      spriteID: 0b80a75ce9b58de489062d6ded5644c8
+      internalID: 836999016
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_9
+      name: NormalAngel-Sheet_9
       rect:
         serializedVersion: 2
         x: 1152
@@ -310,14 +310,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 83875efba1a4ff748968d074e2ee05f7
-      internalID: -1786717580
+      spriteID: f40d3efc91731ff45b633e77d9d21d68
+      internalID: 318583078
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_10
+      name: NormalAngel-Sheet_10
       rect:
         serializedVersion: 2
         x: 1280
@@ -332,14 +332,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6bdbf68e7a4154a41b41ec39262e5cad
-      internalID: 1487479814
+      spriteID: 2e84097b09f95fa44a91d3a11f9a80fa
+      internalID: -1871379585
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_11
+      name: NormalAngel-Sheet_11
       rect:
         serializedVersion: 2
         x: 1408
@@ -354,14 +354,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f6f422fa9e785e043a25ab60b62a4121
-      internalID: -253955706
+      spriteID: a57a91d91767fd94e9897dd983c60c47
+      internalID: -824690307
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_12
+      name: NormalAngel-Sheet_12
       rect:
         serializedVersion: 2
         x: 1536
@@ -376,14 +376,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: aabd4da56c9edc14f8436456cc4be8d8
-      internalID: -909465965
+      spriteID: 2adb11bac99b36348b46fec7741c30e5
+      internalID: -857644903
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlayerPortraitSheet_13
+      name: NormalAngel-Sheet_13
       rect:
         serializedVersion: 2
         x: 1664
@@ -398,8 +398,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0114ffcbe0b636d489e1f7cfacdd94fa
-      internalID: -1928366708
+      spriteID: 25e1b3f0dead7a746a423847eb3eca77
+      internalID: -792639961
       vertices: []
       indices: 
       edges: []
@@ -408,7 +408,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 8c07af2e90f41ee46af99a1ac00d72e9
+    spriteID: f47c985b8dd52ea4c859a475b65a2330
     internalID: 0
     vertices: []
     indices: 
@@ -420,20 +420,20 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":128.0,"y":128.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      PlayerPortraitSheet_0: -449707224
-      PlayerPortraitSheet_1: 1245050396
-      PlayerPortraitSheet_10: 1487479814
-      PlayerPortraitSheet_11: -253955706
-      PlayerPortraitSheet_12: -909465965
-      PlayerPortraitSheet_13: -1928366708
-      PlayerPortraitSheet_2: -2085272300
-      PlayerPortraitSheet_3: -1438641395
-      PlayerPortraitSheet_4: 558603055
-      PlayerPortraitSheet_5: -1672043721
-      PlayerPortraitSheet_6: 1226281510
-      PlayerPortraitSheet_7: 1937167732
-      PlayerPortraitSheet_8: -575426680
-      PlayerPortraitSheet_9: -1786717580
+      NormalAngel-Sheet_0: -931615042
+      NormalAngel-Sheet_1: -1199246827
+      NormalAngel-Sheet_10: -1871379585
+      NormalAngel-Sheet_11: -824690307
+      NormalAngel-Sheet_12: -857644903
+      NormalAngel-Sheet_13: -792639961
+      NormalAngel-Sheet_2: 479871594
+      NormalAngel-Sheet_3: -61239356
+      NormalAngel-Sheet_4: 1373266489
+      NormalAngel-Sheet_5: 472075659
+      NormalAngel-Sheet_6: -856255287
+      NormalAngel-Sheet_7: 11468455
+      NormalAngel-Sheet_8: 836999016
+      NormalAngel-Sheet_9: 318583078
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
