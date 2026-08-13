@@ -99,6 +99,7 @@ public class EnemyFSM : MonoBehaviour
     {
         Debug.Log("기본공격!");
         SetTurnDisplayVisible(false);
+        CorruptionHealth.Instance.TakeDamage(20);
         TurnSwap();
     }
     void SkillAttackMarkAppear()
@@ -112,6 +113,7 @@ public class EnemyFSM : MonoBehaviour
     {
         Debug.Log("스킬공격!");
         SetTurnDisplayVisible(false);
+        CorruptionHealth.Instance.TakeDamage(20);
         TurnSwap();
     }
     void FailAttackMark()
@@ -153,7 +155,6 @@ public class EnemyFSM : MonoBehaviour
         Action<EnemyFSM> callback = turnCompleted;
         turnCompleted = null;
         callback?.Invoke(this);
-        CorruptionHealth.Instance.TakeDamage(20);
     }
     // Update is called once per frame
     private void EnemyTurn()
