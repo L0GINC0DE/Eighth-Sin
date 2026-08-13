@@ -5,6 +5,8 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class CorruptionHealth : MonoBehaviour
 {
+    public static CorruptionHealth Instance { get; private set; }
+
     [Header("Corruption")]
     [Min(1)]
     [SerializeField] private int baseMaxCorruption = 100;
@@ -34,11 +36,31 @@ public sealed class CorruptionHealth : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        Instance = this;
+
         if (gaugeImage == null)
             gaugeImage = GetComponent<Image>();
 
         ClampValues();
         UpdateGauge();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetInstance()
+    {
+        Instance = null;
     }
 
     private void OnValidate()
