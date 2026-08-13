@@ -69,6 +69,8 @@ public class DiceRotation : MonoBehaviour
             results.Add(result);
 
             Vector3 resultAngle = GetResultAngle(result);
+            Quaternion resultLocalRotation =
+                diceHome.LocalRotation * Quaternion.Euler(resultAngle);
             ObjectDrag objectDrag = dice.GetComponent<ObjectDrag>();
 
             if (objectDrag != null)
@@ -89,11 +91,12 @@ public class DiceRotation : MonoBehaviour
 
             Tween rotationTween = dice.transform
                 .DOLocalRotate(
-                    resultAngle + extraSpin,
+                    resultLocalRotation.eulerAngles + extraSpin,
                     rotationDuration,
                     RotateMode.FastBeyond360
                 )
                 .SetEase(rotationEase);
+            Debug.Log(diceValue.Value);
 
             diceSequence.Insert(i * startInterval, rotationTween);
         }
@@ -155,9 +158,9 @@ public class DiceRotation : MonoBehaviour
         return result switch
         {
             1 => new Vector3(0f, 0f, 0f),
-            2 => new Vector3(0f, 90f, 0f),
+            2 => new Vector3(-180f, 90f, 0f),
             3 => new Vector3(-90f, 0f, 0f),
-            4 => new Vector3(0f, -90f, 0f),
+            4 => new Vector3(180f, -90f, 0f),
             5 => new Vector3(90f, 0f, 0f),
             6 => new Vector3(180f, 0f, 0f),
             _ => Vector3.zero

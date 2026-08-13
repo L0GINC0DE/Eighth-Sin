@@ -15,6 +15,7 @@ public class TurnManager : MonoBehaviour
     public BattleState State => battleState;
     public DicePool DicePool { get; private set; }
     public bool IsProcessingTurn => _isProcessingTurn;
+    public bool IsPlayerActionInProgress => _playerActionOwner != null;
     public IReadOnlyList<EnemyFSM> Enemies => enemies;
 
     public event Action<Team> OnTurnChanged;
@@ -25,6 +26,7 @@ public class TurnManager : MonoBehaviour
     public event Action<bool> OnBattleEnded;
 
     private bool _isProcessingTurn;
+    private UnityEngine.Object _playerActionOwner;
     private readonly List<EnemyFSM> _enemyTurnOrder = new();
     private EnemyFSM _activeEnemy;
     private int _enemyTurnIndex;
@@ -55,6 +57,7 @@ public class TurnManager : MonoBehaviour
     public bool TryEndPlayerTurn()
     {
         if (_isProcessingTurn ||
+            IsPlayerActionInProgress ||
             battleState.IsBattleOver ||
             CurrentTurn != Team.Player)
         {
@@ -66,6 +69,27 @@ public class TurnManager : MonoBehaviour
         SetTurn(Team.Enemy);
         BeginEnemyTurn();
         return true;
+    }
+
+    public bool TryBeginPlayerAction(UnityEngine.Object owner)
+    {
+        if (owner == null ||
+            IsPlayerActionInProgress ||
+            _isProcessingTurn ||
+            battleState.IsBattleOver ||
+            CurrentTurn != Team.Player)
+        {
+            return false;
+        }
+
+        _playerActionOwner = owner;
+        return true;
+    }
+
+    public void CompletePlayerAction(UnityEngine.Object owner)
+    {
+        if (_playerActionOwner == owner)
+            _playerActionOwner = null;
     }
 
     public bool TryEndPlayerTurnIfDiceDepleted()
@@ -82,6 +106,7 @@ public class TurnManager : MonoBehaviour
             return;
 
         _activeEnemy = null;
+        _playerActionOwner = null;
         _enemyTurnOrder.Clear();
         OnEnemyTurnEnded?.Invoke();
         _isProcessingTurn = false;
@@ -96,6 +121,7 @@ public class TurnManager : MonoBehaviour
             return;
 
         battleState.EndBattle(playerWon);
+        _playerActionOwner = null;
         _isProcessingTurn = false;
         OnBattleEnded?.Invoke(playerWon);
     }

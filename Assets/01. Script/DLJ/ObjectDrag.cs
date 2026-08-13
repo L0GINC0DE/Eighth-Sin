@@ -129,8 +129,10 @@ public class ObjectDrag : MonoBehaviour
 
             if (skillSystem != null)
             {
-                skillSystem.InsertDice(Icon);
-                Debug.Log("hit info : " + skillSystem.gameObject.name);
+                if (skillSystem.InsertDice(Icon))
+                    Debug.Log("hit info : " + skillSystem.gameObject.name);
+                else
+                    RestoreDraggedObject();
             }
             else
                 RestoreDraggedObject();

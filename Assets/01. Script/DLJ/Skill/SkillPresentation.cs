@@ -51,8 +51,9 @@ public sealed class SkillPresentation : MonoBehaviour
         Quaternion surfaceLocalRotation = skillBody != null
             ? skillBody.localRotation
             : diceSocket.localRotation;
+        Quaternion diceFaceUpright = Quaternion.Euler(0f, 0f, 180f);
         Quaternion insertRotation =
-            surfaceLocalRotation * savedResultRotation;
+            surfaceLocalRotation * diceFaceUpright * savedResultRotation;
         float approachDistance = activeSettings != null
             ? activeSettings.InsertDistance
             : 0.5f;

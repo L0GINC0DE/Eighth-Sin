@@ -18,6 +18,8 @@ public class SkillSystem : MonoBehaviour
 
     private int pendingDiceValue;
     private int usesThisTurn;
+    private bool isResolving;
+    private bool ownsPlayerAction;
 
     public UnityEvent skillActivation = new();
 
@@ -29,7 +31,6 @@ public class SkillSystem : MonoBehaviour
     private void Start()
     {
         ResolveDependencies();
-        skillActivation.AddListener(ActivateSkill);
 
         if (turnManager != null)
             turnManager.OnPlayerTurnStarted += ResetForPlayerTurn;
@@ -38,7 +39,10 @@ public class SkillSystem : MonoBehaviour
     private void OnDestroy()
     {
         if (turnManager != null)
+        {
             turnManager.OnPlayerTurnStarted -= ResetForPlayerTurn;
+            ReleasePlayerAction();
+        }
     }
 
     private void ActivateSkillTest()
@@ -49,10 +53,6 @@ public class SkillSystem : MonoBehaviour
     private void ActivateSkill()
     {
         ResolveDependencies();
-
-        SkillType resolvedSkillType = skillSo != null
-            ? skillSo.SkillType
-            : skillType;
 
         if (skillSo != null && skillExecutor != null)
         {
@@ -69,43 +69,22 @@ public class SkillSystem : MonoBehaviour
         }
 
         usesThisTurn++;
-
-        bool playerWon = resolvedSkillType == SkillType.Attack &&
-                         target != null &&
-                         target.Die &&
-                         !HasLivingEnemies();
-
-        if (playerWon)
-        {
-            turnManager?.EndBattle(true);
-            return;
-        }
-
-        if (turnManager != null && turnManager.State.IsCorruptionLethal)
-        {
-            turnManager.EndBattle(false);
-            return;
-        }
-
-        switch (resolvedSkillType)
-        {
-            case SkillType.Attack:
-                turnManager?.EndPlayerTurn();
-                break;
-            case SkillType.Defend:
-                break;
-            case SkillType.Utility:
-                break;
-        }
     }
 
-    public void InsertDice(GameObject dice)
+    public bool InsertDice(GameObject dice)
     {
         if (dice == null)
-            return;
+            return false;
 
         if (!CanUseThisTurn())
-            return;
+            return false;
+
+        ResolveDependencies();
+
+        if (turnManager != null && !turnManager.TryBeginPlayerAction(this))
+            return false;
+
+        ownsPlayerAction = turnManager != null;
 
         DicePool activeDicePool = ResolveDicePool();
         DiceValue diceValue = dice.GetComponent<DiceValue>();
@@ -113,9 +92,11 @@ public class SkillSystem : MonoBehaviour
         if (activeDicePool != null &&
             (diceValue == null || !activeDicePool.TryConsumeDieValue(diceValue.Value)))
         {
-            return;
+            ReleasePlayerAction();
+            return false;
         }
 
+        isResolving = true;
         pendingDiceValue = diceValue != null ? diceValue.Value : 0;
 
         Transform diceTransform = dice.transform;
@@ -130,19 +111,33 @@ public class SkillSystem : MonoBehaviour
             savedResultRotation,
             () => CompleteSkillPresentation(dice, activeDicePool)
         );
+
+        return true;
     }
 
     private void CompleteSkillPresentation(GameObject dice, DicePool activeDicePool)
     {
+        if (!isResolving)
+            return;
+
+        isResolving = false;
         bool isAttackSkill = GetResolvedSkillType() == SkillType.Attack;
 
-        dice.SetActive(false);
+        if (dice != null)
+            dice.SetActive(false);
 
         if (isAttackSkill)
             presentation.Hide();
 
+        ActivateSkill();
         skillActivation?.Invoke();
-        activeDicePool?.TryEndPlayerTurnIfEmpty();
+
+        bool playerWon = isAttackSkill &&
+                         target != null &&
+                         target.Die &&
+                         !HasLivingEnemies();
+        bool playerLost = turnManager != null &&
+                          turnManager.State.IsCorruptionLethal;
 
         if (ShouldRemainAvailable())
         {
@@ -151,6 +146,25 @@ public class SkillSystem : MonoBehaviour
         }
         else if (!isAttackSkill)
             presentation.Hide();
+
+        ReleasePlayerAction();
+
+        if (playerWon)
+        {
+            turnManager?.EndBattle(true);
+            return;
+        }
+
+        if (playerLost)
+        {
+            turnManager.EndBattle(false);
+            return;
+        }
+
+        if (isAttackSkill)
+            turnManager?.EndPlayerTurn();
+        else
+            activeDicePool?.TryEndPlayerTurnIfEmpty();
     }
 
     private DicePool ResolveDicePool()
@@ -214,6 +228,9 @@ public class SkillSystem : MonoBehaviour
 
     private bool CanUseThisTurn()
     {
+        if (isResolving)
+            return false;
+
         if (turnManager != null &&
             (turnManager.State.IsBattleOver || turnManager.CurrentTurn != Team.Player))
         {
@@ -273,10 +290,21 @@ public class SkillSystem : MonoBehaviour
 
     private void ResetForPlayerTurn()
     {
+        isResolving = false;
+        ownsPlayerAction = false;
         usesThisTurn = 0;
         presentation.ResetView();
 
         if (turnManager != null && !turnManager.State.IsBattleOver)
             presentation.Show();
+    }
+
+    private void ReleasePlayerAction()
+    {
+        if (!ownsPlayerAction)
+            return;
+
+        turnManager?.CompletePlayerAction(this);
+        ownsPlayerAction = false;
     }
 }
