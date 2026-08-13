@@ -153,6 +153,7 @@ public class EnemyFSM : MonoBehaviour
         Action<EnemyFSM> callback = turnCompleted;
         turnCompleted = null;
         callback?.Invoke(this);
+        CorruptionHealth.Instance.TakeDamage(20);
     }
     // Update is called once per frame
     private void EnemyTurn()
