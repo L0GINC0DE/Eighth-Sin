@@ -1,12 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TurnManager : MonoSingleton<TurnManager>
 {
-    private enum BattleState { Ready, PlayerTurn, Processing, Ended }
-
-    private BattleState state;
+    public enum BattleState { Ready, PlayerTurn, EnemyTurn, Ended }
     
     [SerializeField] private BattleUnit player;
     [SerializeField] private float turnDelay = 0.8f;
@@ -14,6 +13,9 @@ public class TurnManager : MonoSingleton<TurnManager>
     private readonly List<BattleUnit> enemies = new();
     private bool isProcessing;
 
+    public event Action<BattleState> BattleStateChanged;
+
+    public BattleState State { get; private set; }
     public BattleUnit CurrentUnit { get; private set; }
     public bool BattleEnded { get; private set; }
     public bool IsPlayerTurn => CurrentUnit != null && CurrentUnit == player;
@@ -32,6 +34,7 @@ public class TurnManager : MonoSingleton<TurnManager>
         BattleEnded = false;
 
         if (units != null) enemies.AddRange(units);
+        SetBattleState(BattleState.Ready);
     }
 
     public void StartTurn()
@@ -42,20 +45,19 @@ public class TurnManager : MonoSingleton<TurnManager>
         BeginPlayerTurn();
     }
 
+    public void AttackFirstEnemy()
+    {
+        PlayerAttack(GetFirstLivingEnemy());
+    }
+
     public bool PlayerAttack(BattleUnit target)
     {
         if (!isActiveAndEnabled || isProcessing) return false;
         if (!IsPlayerTurn) return false;
         if (target == null || !enemies.Contains(target) || !IsAlive(target)) return false;
 
-        state = BattleState.Processing;
-        bool executed = new AttackCommand(player, target).Execute();
-
-        if (!executed) 
-        {
-            state = BattleState.PlayerTurn;
+        if (!new AttackCommand(player, target).Execute())
             return false;
-        }
 
         Debug.Log($"플레이어가 적 [{target.name}]을 공격", target);
         EndTurn();
@@ -69,6 +71,7 @@ public class TurnManager : MonoSingleton<TurnManager>
         if (!IsPlayerTurn) return;
 
         isProcessing = true;
+        SetBattleState(BattleState.EnemyTurn);
         StartCoroutine(EnemyRoutine());
     }
 
@@ -76,6 +79,7 @@ public class TurnManager : MonoSingleton<TurnManager>
     {
         if (CheckBattleEnd()) return;
         CurrentUnit = player;
+        SetBattleState(BattleState.PlayerTurn);
         Debug.Log("플레이어 턴", player);
     }
 
@@ -86,8 +90,17 @@ public class TurnManager : MonoSingleton<TurnManager>
 
         BattleEnded = true;
         CurrentUnit = null;
+        SetBattleState(BattleState.Ended);
         Debug.Log(IsAlive(player) ? "승리" : "패배", this);
         return true;
+    }
+
+    private void SetBattleState(BattleState nextState)
+    {
+        if (State == nextState) return;
+
+        State = nextState;
+        BattleStateChanged?.Invoke(State);
     }
 
     public BattleUnit GetFirstLivingEnemy() => enemies.Find(IsAlive);

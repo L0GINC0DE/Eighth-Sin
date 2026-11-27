@@ -3,6 +3,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class DiceStack : MonoBehaviour
 {
@@ -14,7 +15,11 @@ public class DiceStack : MonoBehaviour
     [SerializeField] private RectTransform secondHand;
     [SerializeField, Min(0f)] private float handRevealHeight = 400f;
     [SerializeField, Min(0f)] private float slideDuration = 0.25f;
+    [SerializeField] private TurnManager turnManager;
+    [SerializeField] private Button attackButton;
+    [SerializeField] private TMP_Text currentTurnLabel;
 
+    private readonly Dictionary<RectTransform, Vector2> diceStartPositions = new();
     private readonly Dictionary<RectTransform, float> diceRestPositions = new();
     private RectTransform stackRect;
     private RectTransform activeDie;
@@ -31,7 +36,10 @@ public class DiceStack : MonoBehaviour
         {
             RectTransform dieRect = (RectTransform)die.transform;
             if (dieRect.parent == stackRect)
+            {
+                diceStartPositions.Add(dieRect, dieRect.anchoredPosition);
                 diceRestPositions.Add(dieRect, dieRect.anchoredPosition.y);
+            }
         }
 
         if (hand != null)
@@ -40,8 +48,20 @@ public class DiceStack : MonoBehaviour
             secondHandRestPosition = secondHand.anchoredPosition;
     }
 
+    private void OnEnable()
+    {
+        if (turnManager == null)
+            return;
+
+        turnManager.BattleStateChanged += UpdateBattleHud;
+        UpdateBattleHud(turnManager.State);
+    }
+
     private void Start()
     {
+        if (turnManager != null)
+            return;
+
         RollDice();
         UpdateLayout(showHand: false, animate: false);
     }
@@ -85,8 +105,56 @@ public class DiceStack : MonoBehaviour
 
     private void OnDisable()
     {
+        if (turnManager != null)
+            turnManager.BattleStateChanged -= UpdateBattleHud;
+
         if (isPresenting)
             ConsumePresentedDie();
+
+        UpdateLayout(showHand: false, animate: false);
+    }
+
+    private void UpdateBattleHud(TurnManager.BattleState state)
+    {
+        if (currentTurnLabel != null)
+        {
+            currentTurnLabel.text = state switch
+            {
+                TurnManager.BattleState.PlayerTurn => "Current Turn: Player",
+                TurnManager.BattleState.EnemyTurn => "Current Turn: Enemy",
+                TurnManager.BattleState.Ended => "Battle Over",
+                _ => "Current Turn: -"
+            };
+        }
+
+        SetPlayerDiceAvailable(state == TurnManager.BattleState.PlayerTurn);
+    }
+
+    private void SetPlayerDiceAvailable(bool available)
+    {
+        if (attackButton != null)
+            attackButton.interactable = available;
+
+        if (!available)
+            ConsumePresentedDie();
+
+        foreach (var entry in diceStartPositions)
+        {
+            RectTransform die = entry.Key;
+            if (die == null)
+                continue;
+
+            if (available)
+            {
+                die.anchoredPosition = entry.Value;
+                diceRestPositions[die] = entry.Value.y;
+            }
+
+            die.gameObject.SetActive(available);
+        }
+
+        if (available)
+            RollDice();
 
         UpdateLayout(showHand: false, animate: false);
     }
