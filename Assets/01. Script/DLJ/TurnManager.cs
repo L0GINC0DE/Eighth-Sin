@@ -1,221 +1,124 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurnManager : MonoBehaviour
+public class TurnManager : MonoSingleton<TurnManager>
 {
-    [SerializeField] private Team startingTurn = Team.Player;
-    [SerializeField] private BattleState battleState = new();
+    private enum BattleState { Ready, PlayerTurn, Processing, Ended }
 
-    [Header("Enemies")]
-    [SerializeField] private bool autoFindEnemies = true;
-    [SerializeField] private List<EnemyFSM> enemies = new();
+    private BattleState state;
+    
+    [SerializeField] private BattleUnit player;
+    [SerializeField] private float turnDelay = 0.8f;
 
-    public Team CurrentTurn => battleState.CurrentTurn;
-    public BattleState State => battleState;
-    public DicePool DicePool { get; private set; }
-    public bool IsProcessingTurn => _isProcessingTurn;
-    public bool IsPlayerActionInProgress => _playerActionOwner != null;
-    public IReadOnlyList<EnemyFSM> Enemies => enemies;
+    private readonly List<BattleUnit> enemies = new();
+    private bool isProcessing;
 
-    public event Action<Team> OnTurnChanged;
-    public event Action OnPlayerTurnStarted;
-    public event Action OnPlayerTurnEnded;
-    public event Action OnEnemyTurnStarted;
-    public event Action OnEnemyTurnEnded;
-    public event Action<bool> OnBattleEnded;
+    public BattleUnit CurrentUnit { get; private set; }
+    public bool BattleEnded { get; private set; }
+    public bool IsPlayerTurn => CurrentUnit != null && CurrentUnit == player;
 
-    private bool _isProcessingTurn;
-    private UnityEngine.Object _playerActionOwner;
-    private readonly List<EnemyFSM> _enemyTurnOrder = new();
-    private EnemyFSM _activeEnemy;
-    private int _enemyTurnIndex;
-
-    private void Awake()
+    private void LateUpdate()
     {
-        battleState ??= new BattleState();
-        battleState.BeginBattle(startingTurn);
-
-        DicePool = GetComponent<DicePool>();
-
-        if (DicePool == null)
-            DicePool = gameObject.AddComponent<DicePool>();
-
-        DicePool.Initialize(this);
+        if (CurrentUnit != null && !isProcessing) CheckBattleEnd();
     }
 
-    private void Start()
+    public void AddTurn(IEnumerable<BattleUnit> units)
     {
-        NotifyTurnStarted(CurrentTurn);
+        if (isProcessing) return;
+
+        CurrentUnit = null;
+        enemies.Clear();
+        BattleEnded = false;
+
+        if (units != null) enemies.AddRange(units);
     }
 
-    public void EndPlayerTurn()
+    public void StartTurn()
     {
-        TryEndPlayerTurn();
+        if (!isActiveAndEnabled || isProcessing) return;
+        if (CurrentUnit != null || BattleEnded) return;
+        if (player == null) return;
+        BeginPlayerTurn();
     }
 
-    public bool TryEndPlayerTurn()
+    public bool PlayerAttack(BattleUnit target)
     {
-        if (_isProcessingTurn ||
-            IsPlayerActionInProgress ||
-            battleState.IsBattleOver ||
-            CurrentTurn != Team.Player)
+        if (!isActiveAndEnabled || isProcessing) return false;
+        if (!IsPlayerTurn) return false;
+        if (target == null || !enemies.Contains(target) || !IsAlive(target)) return false;
+
+        state = BattleState.Processing;
+        bool executed = new AttackCommand(player, target).Execute();
+
+        if (!executed) 
         {
+            state = BattleState.PlayerTurn;
             return false;
         }
 
-        _isProcessingTurn = true;
-        OnPlayerTurnEnded?.Invoke();
-        SetTurn(Team.Enemy);
-        BeginEnemyTurn();
+        Debug.Log($"플레이어가 적 [{target.name}]을 공격", target);
+        EndTurn();
         return true;
     }
 
-    public bool TryBeginPlayerAction(UnityEngine.Object owner)
-    {
-        if (owner == null ||
-            IsPlayerActionInProgress ||
-            _isProcessingTurn ||
-            battleState.IsBattleOver ||
-            CurrentTurn != Team.Player)
-        {
-            return false;
-        }
 
-        _playerActionOwner = owner;
+    public void EndTurn()
+    {
+        if (!isActiveAndEnabled || isProcessing) return;
+        if (!IsPlayerTurn) return;
+
+        isProcessing = true;
+        StartCoroutine(EnemyRoutine());
+    }
+
+    private void BeginPlayerTurn()
+    {
+        if (CheckBattleEnd()) return;
+        CurrentUnit = player;
+        Debug.Log("플레이어 턴", player);
+    }
+
+    private bool CheckBattleEnd()
+    {
+        if (BattleEnded) return true;
+        if (IsAlive(player) && GetFirstLivingEnemy() != null) return false;
+
+        BattleEnded = true;
+        CurrentUnit = null;
+        Debug.Log(IsAlive(player) ? "승리" : "패배", this);
         return true;
     }
 
-    public void CompletePlayerAction(UnityEngine.Object owner)
+    public BattleUnit GetFirstLivingEnemy() => enemies.Find(IsAlive);
+
+    
+
+    private IEnumerator EnemyRoutine()
     {
-        if (_playerActionOwner == owner)
-            _playerActionOwner = null;
-    }
-
-    public bool TryEndPlayerTurnIfDiceDepleted()
-    {
-        if (battleState.HasDice)
-            return false;
-
-        return TryEndPlayerTurn();
-    }
-
-    public void EndEnemyTurn()
-    {
-        if (battleState.IsBattleOver || CurrentTurn != Team.Enemy)
-            return;
-
-        _activeEnemy = null;
-        _playerActionOwner = null;
-        _enemyTurnOrder.Clear();
-        OnEnemyTurnEnded?.Invoke();
-        _isProcessingTurn = false;
-        SetTurn(Team.Player);
-        DicePool.RollForPlayerTurn();
-        OnPlayerTurnStarted?.Invoke();
-    }
-
-    public void EndBattle(bool playerWon)
-    {
-        if (battleState.IsBattleOver)
-            return;
-
-        battleState.EndBattle(playerWon);
-        _playerActionOwner = null;
-        _isProcessingTurn = false;
-        OnBattleEnded?.Invoke(playerWon);
-    }
-
-    private void SetTurn(Team team)
-    {
-        battleState.SetTurn(team);
-        OnTurnChanged?.Invoke(team);
-        Debug.Log($"Turn changed: {team}");
-    }
-
-    private void NotifyTurnStarted(Team team)
-    {
-        OnTurnChanged?.Invoke(team);
-
-        if (team == Team.Player)
+        foreach (var enemy in enemies)
         {
-            DicePool.RollForPlayerTurn();
-            OnPlayerTurnStarted?.Invoke();
-        }
-        else
-        {
-            _isProcessingTurn = true;
-            BeginEnemyTurn();
-        }
-    }
+            EnemyTurn(enemy);
+            yield return new WaitForSeconds(turnDelay);
 
-    private void BeginEnemyTurn()
-    {
-        OnEnemyTurnStarted?.Invoke();
-        BuildEnemyTurnOrder();
-        _enemyTurnIndex = 0;
-        ProcessNextEnemy();
-    }
-
-    private void BuildEnemyTurnOrder()
-    {
-        _enemyTurnOrder.Clear();
-
-        foreach (EnemyFSM enemy in enemies)
-            AddEnemyToTurnOrder(enemy);
-
-        if (autoFindEnemies)
-        {
-            EnemyFSM[] foundEnemies =
-                FindObjectsByType<EnemyFSM>(FindObjectsSortMode.None);
-
-            foreach (EnemyFSM enemy in foundEnemies)
-                AddEnemyToTurnOrder(enemy);
+            if (!CheckBattleEnd() || IsAlive(enemy))
+            {
+                new AttackCommand(CurrentUnit, player).Execute();
+                Debug.Log($"적 공격");
+            }
         }
 
-        _enemyTurnOrder.Sort((left, right) =>
-        {
-            int priorityComparison =
-                right.TurnPriority.CompareTo(left.TurnPriority);
-
-            return priorityComparison != 0
-                ? priorityComparison
-                : left.GetInstanceID().CompareTo(right.GetInstanceID());
-        });
+        isProcessing = false;
+        BeginPlayerTurn();
     }
 
-    private void AddEnemyToTurnOrder(EnemyFSM enemy)
+    private void EnemyTurn(BattleUnit enemy)
     {
-        if (enemy != null && !_enemyTurnOrder.Contains(enemy))
-            _enemyTurnOrder.Add(enemy);
+        if (CheckBattleEnd() || !IsAlive(enemy)) return;
+        CurrentUnit = enemy;
+        Debug.Log($"적 턴: {CurrentUnit.name}", enemy);
     }
 
-    private void ProcessNextEnemy()
-    {
-        if (battleState.IsBattleOver || CurrentTurn != Team.Enemy)
-            return;
 
-        while (_enemyTurnIndex < _enemyTurnOrder.Count)
-        {
-            EnemyFSM enemy = _enemyTurnOrder[_enemyTurnIndex++];
-
-            if (enemy == null || enemy.Die || !enemy.isActiveAndEnabled)
-                continue;
-
-            _activeEnemy = enemy;
-            enemy.TakeTurn(HandleEnemyTurnCompleted);
-            return;
-        }
-
-        EndEnemyTurn();
-    }
-
-    private void HandleEnemyTurnCompleted(EnemyFSM enemy)
-    {
-        if (enemy != _activeEnemy)
-            return;
-
-        _activeEnemy = null;
-        ProcessNextEnemy();
-    }
+    private static bool IsAlive(BattleUnit unit) => unit != null && unit.IsAlive;
 }

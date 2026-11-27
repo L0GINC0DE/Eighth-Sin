@@ -99,7 +99,6 @@ public class EnemyFSM : MonoBehaviour
     {
         Debug.Log("기본공격!");
         SetTurnDisplayVisible(false);
-        CorruptionHealth.Instance.TakeDamage(20);
         TurnSwap();
     }
     void SkillAttackMarkAppear()
@@ -113,7 +112,6 @@ public class EnemyFSM : MonoBehaviour
     {
         Debug.Log("스킬공격!");
         SetTurnDisplayVisible(false);
-        CorruptionHealth.Instance.TakeDamage(20);
         TurnSwap();
     }
     void FailAttackMark()
